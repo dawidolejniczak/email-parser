@@ -1,1 +1,1 @@
-{{ $mail->content }}
+{{ $content }}

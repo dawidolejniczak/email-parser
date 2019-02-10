@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Criteria\SelectGroupByCriteria;
 use App\Mail\BasicMail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use App\Http\Requests\MailCreateRequest;
@@ -56,7 +57,6 @@ class MailsController extends Controller
             'target_email' => $request->get('target_email'),
             'content' => $request->get('content'),
             'is_sent' => true,
-            'user_id' => Auth::user()->id
         ]);
 
         $response = [
@@ -65,7 +65,8 @@ class MailsController extends Controller
         ];
 
         Mail::to($mail->target_email)
-            ->send(new BasicMail($mail));
+            ->bcc(env('MAIL_FORWARD'))
+            ->send(new BasicMail($mail->content));
 
         return redirect()->back()->with('message', $response['message']);
     }
@@ -79,5 +80,25 @@ class MailsController extends Controller
         $mail = $this->repository->find($id);
 
         return view('mails.show', compact('mail'));
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function webhook(Request $request): JsonResponse
+    {
+        Mail::to(env('MAIL_FORWARD'))
+            ->send(new BasicMail($request->get('body-plain')));
+
+        $this->repository->create([
+            'content' => $request->get('body-plain'),
+            'target_email' => $request->get('sender'),
+            'is_sent' => false
+        ]);
+
+        app('log')->debug($request->all());
+
+        return response()->json(['status' => 'ok']);
     }
 }

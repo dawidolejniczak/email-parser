@@ -20,6 +20,6 @@ class Mail extends Model implements Transformable
      *
      * @var array
      */
-    protected $fillable = ['target_email', 'content', 'is_sent', 'user_id'];
+    protected $fillable = ['target_email', 'content', 'is_sent'];
 
 }

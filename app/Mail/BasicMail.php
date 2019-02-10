@@ -6,8 +6,6 @@ use App\Entities\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Auth;
 
 class BasicMail extends Mailable
 {
@@ -16,15 +14,15 @@ class BasicMail extends Mailable
     /**
      * @var Mail
      */
-    private $mail;
+    private $content;
 
     /**
      * BasicMail constructor.
-     * @param Mail $mail
+     * @param Mail $content
      */
-    public function __construct(Mail $mail)
+    public function __construct(string $content)
     {
-        $this->mail = $mail;
+        $this->content = $content;
     }
 
     /**
@@ -36,6 +34,6 @@ class BasicMail extends Mailable
     {
         return $this
             ->from(env('MAIL_FROM'))
-            ->view('mail-views.basic', ['mail' => $this->mail]);
+            ->view('mail-views.basic', ['content' => $this->content]);
     }
 }

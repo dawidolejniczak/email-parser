@@ -19,7 +19,6 @@ class CreateMailsTable extends Migration
             $table->increments('id');
             $table->text('content');
             $table->string('target_email');
-            $table->unsignedInteger('user_id');
             $table->boolean('is_sent');
             $table->timestamps();
 		});
