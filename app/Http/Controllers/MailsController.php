@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Criteria\SelectGroupByCriteria;
 use App\Mail\BasicMail;
+use http\Env\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 
@@ -73,7 +74,7 @@ class MailsController extends Controller
             'message' => 'Mail created.',
             'data' => $mail->toArray(),
         ];
-        
+
 
         return redirect()->back()->with('message', $response['message']);
     }
@@ -99,17 +100,24 @@ class MailsController extends Controller
      */
     public function webhook(Request $request): JsonResponse
     {
-        Mail::to(env('MAIL_FORWARD'))
-            ->send(new BasicMail($request->get('stripped-html')));
 
-        $this->repository->create([
-            'content' => $request->get('stripped-html'),
-            'target_email' => $request->get('sender'),
-            'is_sent' => false
-        ]);
+        $mailsWithSameTarget = $this->repository->findWhere(['target_email' => $request->get('sender')]);
 
-        app('log')->debug($request->all());
+        if (!$mailsWithSameTarget->isEmpty()) {
+            Mail::to(env('MAIL_FORWARD'))
+                ->send(new BasicMail($request->get('stripped-html')));
 
-        return response()->json(['status' => 'ok']);
+            $this->repository->create([
+                'content' => $request->get('stripped-html'),
+                'target_email' => $request->get('sender'),
+                'is_sent' => false
+            ]);
+
+            app('log')->debug($request->all());
+
+            return response()->json(['status' => 'ok']);
+        }
+
+        return Response::json(['status' => 'fail']);
     }
 }
