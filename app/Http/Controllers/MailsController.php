@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Criteria\SelectGroupByCriteria;
+use App\Mail\BasicMail;
 use Illuminate\Http\RedirectResponse;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use App\Http\Requests\MailCreateRequest;
 use App\Repositories\MailRepository;
@@ -61,6 +63,9 @@ class MailsController extends Controller
             'message' => 'Mail created.',
             'data' => $mail->toArray(),
         ];
+
+        Mail::to($mail->target_email)
+            ->send(new BasicMail($mail));
 
         return redirect()->back()->with('message', $response['message']);
     }

@@ -24,7 +24,7 @@ class MailCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'target_email' => 'required|email|unique:mails',
+            'target_email' => 'required|email',
             'content' => 'required',
         ];
     }
