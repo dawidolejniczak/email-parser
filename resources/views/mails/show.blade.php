@@ -4,23 +4,40 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10">
-                @if(!$mails->isEmpty())
-                    <div class="card">
-                        <div class="card-header">All your threads</div>
-                        <div class="card-body">
-                            <ul class="list-group">
-                                @foreach($mails as $mail)
-                                    <a class="list-group-item" href="{{ route('mail.show', $mail->target_email) }}">
-                                        {{ $mail->target_email }}
-                                    </a>
-                                @endforeach
-                            </ul>
-                        </div>
+                <div class="card">
+                    <div class="card-header">All emails in thread with {{ $mails[0]->target_email }}</div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Content</th>
+                                <th scope="col">Sent at</th>
+                                <th scope="col">Sent from you / to you</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($mails as $mail)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{!! $mail->content !!}</td>
+                                    <td>{{ $mail->created_at }}</td>
+                                    <td>
+                                        @if($mail->is_sent)
+                                            Sent from you
+                                        @else
+                                            Sent to you
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <br/>
-                    <br/>
-                @endif
+                <br/>
+                <br/>
 
                 <div class="card">
                     <div class="card-header">
@@ -44,10 +61,7 @@
                         @endif
                         <form method="post" action="{{ route('mails.store') }}">
                             {{ csrf_field() }}
-                            <div class="form-group">
-                                <label for="target_email">Target Email</label>
-                                <input type="email" class="form-control" id="target_email" name="target_email">
-                            </div>
+                            <input type="hidden" name="target_email" value="{{ $mails[0]->target_email }}">
                             <div class="form-group">
                                 <label for="content">Content</label>
                                 <textarea class="form-control" id="content" name="content"></textarea>

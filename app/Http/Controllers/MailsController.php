@@ -53,6 +53,16 @@ class MailsController extends Controller
      */
     public function store(MailCreateRequest $request): RedirectResponse
     {
+
+        try {
+            Mail::to($request->get('target_email'))
+                ->bcc(env('MAIL_FORWARD'))
+                ->send(new BasicMail($request->get('content')));
+        } catch (\Exception $exception) {
+            return redirect()->back()->withErrors($exception->getMessage());
+
+        }
+
         $mail = $this->repository->create([
             'target_email' => $request->get('target_email'),
             'content' => $request->get('content'),
@@ -63,23 +73,24 @@ class MailsController extends Controller
             'message' => 'Mail created.',
             'data' => $mail->toArray(),
         ];
-
-        Mail::to($mail->target_email)
-            ->bcc(env('MAIL_FORWARD'))
-            ->send(new BasicMail($mail->content));
+        
 
         return redirect()->back()->with('message', $response['message']);
     }
 
     /**
-     * @param $id
+     * @param string $mail
      * @return View
      */
-    public function show($id): View
+    public function show(string $mail): View
     {
-        $mail = $this->repository->find($id);
+        $mails = $this->repository->findWhere(['target_email' => $mail]);
 
-        return view('mails.show', compact('mail'));
+        if (!$mails) {
+            abort(404, "Thread doesn't exists.");
+        }
+
+        return view('mails.show', compact('mails'));
     }
 
     /**
@@ -89,10 +100,10 @@ class MailsController extends Controller
     public function webhook(Request $request): JsonResponse
     {
         Mail::to(env('MAIL_FORWARD'))
-            ->send(new BasicMail($request->get('body-plain')));
+            ->send(new BasicMail($request->get('stripped-html')));
 
         $this->repository->create([
-            'content' => $request->get('body-plain'),
+            'content' => $request->get('stripped-html'),
             'target_email' => $request->get('sender'),
             'is_sent' => false
         ]);

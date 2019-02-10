@@ -21,4 +21,8 @@ Route::resource('mail', 'MailsController')->only([
     'index', 'store', 'show'
 ])->middleware('auth');
 
-Route::post('mails/webhook', 'MailsController@webhook');
+
+Route::get('mails/index', 'MailsControlle@index')->name('mails.index');
+Route::get('mails/{mail}', 'MailsControlle@show')->name('mails.show');
+Route::post('mails', 'MailsController@store')->name('mails.store');
+Route::post('mails/webhook', 'MailsController@webhook')->name('mails.webhook');
