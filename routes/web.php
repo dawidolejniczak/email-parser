@@ -12,13 +12,16 @@
 */
 
 Route::get('/', function () {
-    return redirect()->route('mail.index');
+    return redirect()->route('mails.index');
 });
 
 Auth::routes();
 
 
-Route::get('mails/index', 'MailsControlle@index')->name('mails.index');
-Route::get('mails/{mail}', 'MailsControlle@show')->name('mails.show');
-Route::post('mails', 'MailsController@store')->name('mails.store');
+Route::middleware('auth')->prefix('mails')->group(function () {
+    Route::get('/', 'MailsController@index')->middleware('auth')->name('mails.index');
+    Route::get('mails/{mail}', 'MailsController@show')->name('mails.show');
+    Route::post('/', 'MailsController@store')->name('mails.store');
+});
+
 Route::post('mails/webhook', 'MailsController@webhook')->name('mails.webhook');

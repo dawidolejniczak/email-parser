@@ -10,7 +10,7 @@
                         <div class="card-body">
                             <ul class="list-group">
                                 @foreach($mails as $mail)
-                                    <a class="list-group-item" href="{{ route('mail.show', $mail->target_email) }}">
+                                    <a class="list-group-item" href="{{ route('mails.show', $mail->target_email) }}">
                                         {{ $mail->target_email }}
                                     </a>
                                 @endforeach
