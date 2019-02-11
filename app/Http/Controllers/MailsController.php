@@ -118,6 +118,6 @@ class MailsController extends Controller
             return response()->json(['status' => 'ok']);
         }
 
-        return Response::json(['status' => 'fail']);
+        return response()->json(['status' => 'fail']);
     }
 }

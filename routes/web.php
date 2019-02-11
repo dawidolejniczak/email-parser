@@ -17,10 +17,6 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::resource('mail', 'MailsController')->only([
-    'index', 'store', 'show'
-])->middleware('auth');
-
 
 Route::get('mails/index', 'MailsControlle@index')->name('mails.index');
 Route::get('mails/{mail}', 'MailsControlle@show')->name('mails.show');
